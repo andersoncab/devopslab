@@ -8,6 +8,11 @@ python:
 os: "linux"
 dist: "xenial"
 
+addons:
+    sonarcloud:
+        organization: andersoncab
+        token: ${SONAR_TOKEN}
+
 # Instalação de Módulos que são necessários para a Aplicação.                                                                                                                                            
 install:                                                                                                                                                                                                 
   - pip install flask
@@ -15,6 +20,7 @@ install:
 # Defini o script de Teste que deve rodar toda vez que o código for alterado.                                                                                                                            
 script:                                                                                                                                                                                                  
   - python -m unittest -v test || travis_terminate 1;"
+  - sonar-scanner || travis_terminate 1;  
 
 # Definir o Deploy no Heroku
 deploy:
