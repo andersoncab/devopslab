@@ -34,7 +34,8 @@ deploy:
   on:
       branch: main
 
-notifications:
-  slack: pessoal-zct6199:EsmZBkBObU4isOqH9baPz7oJ
-  on_success: always
-  on_failure: always
+# slack
+# notifications:
+    #  slack: 
+    #  on_success: always
+    #  on_failure: always
