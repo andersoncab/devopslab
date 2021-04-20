@@ -8,31 +8,45 @@ python:
 os: "linux"
 dist: "xenial"
 
-addons:
-    sonarcloud:
-        organization: andersoncab
-        token: ${SONAR_TOKEN}
+jobs:
+    include:
+        - stage: Testes
 
-# Instalação de Módulos que são necessários para a Aplicação.                                                                                                                                            
-install:                                                                                                                                                                                                 
-  - pip install flask flask-wtf coverage
+          name: "Testes Unitários"
+          # Instalação de Módulos que são necessários para a Aplicação.
+          install:
+            - pip install flask flask-wtf coverage
 
-# Defini o script de Teste que deve rodar toda vez que o código for alterado.                                                                                                                            
-script:                                                                                                                                                                                                  
-  - coverage run test.py || travis_terminate 1;
-  - coverage report app.py || travis_terminate 1;
-  - coverage xml app.py || travis_terminate 1;
-  - sonar-scanner || travis_terminate 1;
+          # Defini o script de Teste que deve rodar toda vez que o código for alterado.
+          script:
+            - coverage run test.py || travis_terminate 1;
+            - coverage report app.py || travis_terminate 1;
+            - coverage xml app.py || travis_terminate 1;
 
-# Definir o Deploy no Heroku
-deploy:
-  provider: heroku
-  strategy: api
-  api_key: $HEROKU_API_KEY
-  edge: true 
-  app: devopslab-anderson
-  on:
-      branch: main
+
+        - script:
+            - sonar-scanner || travis_terminate 1;
+
+          name: "Testes de Qualidade e Segurança"
+          addons:
+              sonarcloud:
+                  organization: andersoncab
+                  token: ${SONAR_TOKEN}
+
+
+        - stage: Deploy
+
+          script: skip
+
+          # Definir o Deploy no Heroku
+          deploy:
+              provider: heroku
+              strategy: api
+              api_key: $HEROKU_API_KEY
+              edge: true
+              app: devopslab-anderson
+              on:
+                  branch: main
 
 # slack
 # notifications:
