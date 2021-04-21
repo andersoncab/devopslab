@@ -12,7 +12,7 @@ jobs:
     include:
         - stage: Testes
 
-          name: "Testes Unitários"
+          name: "Testes Unitarios"
           # Instalação de Módulos que são necessários para a Aplicação.
           install:
             - pip install flask flask-wtf coverage
@@ -27,26 +27,40 @@ jobs:
         - script:
             - sonar-scanner || travis_terminate 1;
 
-          name: "Testes de Qualidade e Segurança"
+          name: "Testes de Qualidade e Seguranca"
           addons:
               sonarcloud:
                   organization: andersoncab
                   token: ${SONAR_TOKEN}
 
+        - stage: Staging Deploy
 
-        - stage: Deploy
+          script: skip
+
+          deploy: &heroku
+              provider: heroku
+              strategy: api
+              api_key: $HEROKU_API_KEY
+              app: devopslab-anderson-stg
+              on:
+                  branch: main
+
+        - stage: Staging Test
+
+          script: 'curl http://devopslab-anderson-stg.herokuapp.com'
+
+        - stage: Production Deploy
 
           script: skip
 
           # Definir o Deploy no Heroku
           deploy:
-              provider: heroku
-              strategy: api
-              api_key: $HEROKU_API_KEY
-              edge: true
+              <<: *heroku
               app: devopslab-anderson
-              on:
-                  branch: main
+
+        - stage: Production Test
+
+          script: 'curl http://devopslab-anderson.herokuapp.com'
 
 # slack
 # notifications:
