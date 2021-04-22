@@ -21,14 +21,19 @@ jobs:
           script:
             - coverage run test.py || travis_terminate 1;
             - coverage report app.py || travis_terminate 1;
-            - coverage xml app.py || travis_terminate 1;
-
+            - coverage xml app.py || travis_terminate 1;          
+          workspace:
+              create:
+                  name: coverage
+                  paths:
+                    - coverage.xml
 
         - script:
             - sonar-scanner || travis_terminate 1;
-
           name: "Testes de Qualidade e Seguranca"
-          addons:
+          workspace:
+              use: coverage
+          addons: # Add Sonar Cloud
               sonarcloud:
                   organization: andersoncab
                   token: ${SONAR_TOKEN}
@@ -41,6 +46,7 @@ jobs:
               provider: heroku
               strategy: api
               api_key: $HEROKU_API_KEY
+              edge: true
               app: devopslab-anderson-stg
               on:
                   branch: main
